@@ -133,3 +133,23 @@ def get_goes16(date,product='ABI-L1b-RadF',band=3):
     ds = xr.open_dataset(store)
 
     return ds
+
+def read_goes_ibtracs(filePath,subsetSeason=False,yearStart=0,yearEnd=3000):
+
+    """Read IBTrACS data, after it has been filtered from the GOES full disc spatial range, to a pandas data frame, subset seasons if needed"""
+
+    # Read the data from the CSV
+    df = pd.read_csv(filePath)
+
+    # Convert time strings to datetimes for better querying
+    df['ISO_TIME'] = pd.to_datetime(df['ISO_TIME'])
+    df['SEASON'] = pd.to_numeric(df['SEASON'])
+    df['NUMBER'] = pd.to_numeric(df['NUMBER'])
+    df['LAT'] = pd.to_numeric(df['LAT'])
+    df['LON'] = pd.to_numeric(df['LON'])
+
+    # Subset seasons
+    if subsetSeason:
+        df = df[(df['SEASON'] >= yearStart) & (df['SEASON'] <= yearEnd)]
+
+    return df
